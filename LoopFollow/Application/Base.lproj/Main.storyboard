@@ -452,7 +452,7 @@
                             <constraint firstItem="ZaU-Ss-piB" firstAttribute="top" secondItem="Dt4-CR-Iqb" secondAttribute="top" constant="50" id="cD1-U9-tJJ"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Snoozer" image="zzz" catalog="system" id="TdI-rW-rdW"/>
+                    <tabBarItem key="tabBarItem" title="Snoozer" image="figure.tennis" catalog="system" id="TdI-rW-rdW"/>
                     <connections>
                         <outlet property="AlertLabel" destination="tiA-fs-ZRV" id="bGa-wR-GbX"/>
                         <outlet property="BGLabel" destination="Iq3-I1-HX0" id="nkC-0M-OpG"/>
