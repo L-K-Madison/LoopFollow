@@ -33,13 +33,13 @@ class Storage {
     var mealWithFatProtein = StorageValue<Bool>(key: "mealWithFatProtein", defaultValue: false)
 
     // TODO: This flag can be deleted in March 2027. Check the commit for other places to cleanup.
-    var hasSeenFatProteinOrderChange = StorageValue<Bool>(key: "hasSeenFatProteinOrderChange", defaultValue: false)
+    var hasSeenFatProteinOrderChange = StorageValue<Bool>(key: "hasSeenFatProteinOrderChange", defaultValue: true)
 
     var backgroundRefreshType = StorageValue<BackgroundRefreshType>(key: "backgroundRefreshType", defaultValue: .silentTune)
 
     var selectedBLEDevice = StorageValue<BLEDevice?>(key: "selectedBLEDevice", defaultValue: nil)
 
-    var debugLogLevel = StorageValue<Bool>(key: "debugLogLevel", defaultValue: false)
+    var debugLogLevel = StorageValue<Bool>(key: "debugLogLevel", defaultValue: true)
 
     var contactTrend = StorageValue<ContactIncludeOption>(key: "contactTrend", defaultValue: .off)
     var contactDelta = StorageValue<ContactIncludeOption>(key: "contactDelta", defaultValue: .off)
@@ -116,6 +116,9 @@ class Storage {
     var laEnabled = StorageValue<Bool>(key: "laEnabled", defaultValue: false)
     var laRenewBy = StorageValue<TimeInterval>(key: "laRenewBy", defaultValue: 0)
     var laRenewalFailed = StorageValue<Bool>(key: "laRenewalFailed", defaultValue: false)
+    var laPushToStartToken = StorageValue<String>(key: "laPushToStartToken", defaultValue: "")
+    var laLastPushToStartAt = StorageValue<TimeInterval>(key: "laLastPushToStartAt", defaultValue: 0)
+    var laPushToStartBackoff = StorageValue<TimeInterval>(key: "laPushToStartBackoff", defaultValue: 0)
 
     // Graph Settings [BEGIN]
     var showDots = StorageValue<Bool>(key: "showDots", defaultValue: true)
@@ -126,10 +129,12 @@ class Storage {
     var show30MinLine = StorageValue<Bool>(key: "show30MinLine", defaultValue: false)
     var show90MinLine = StorageValue<Bool>(key: "show90MinLine", defaultValue: false)
     var showMidnightLines = StorageValue<Bool>(key: "showMidnightMarkers", defaultValue: false)
+    var showYesterdayLine = StorageValue<Bool>(key: "showYesterdayLine", defaultValue: false)
     var smallGraphTreatments = StorageValue<Bool>(key: "smallGraphTreatments", defaultValue: true)
 
     var smallGraphHeight = StorageValue<Int>(key: "smallGraphHeight", defaultValue: 40)
     var predictionToLoad = StorageValue<Double>(key: "predictionToLoad", defaultValue: 1.0)
+    var predictionDisplayType = StorageValue<PredictionDisplayType>(key: "predictionDisplayType", defaultValue: .cone)
     var minBasalScale = StorageValue<Double>(key: "minBasalScale", defaultValue: 5.0)
     var minBGScale = StorageValue<Double>(key: "minBGScale", defaultValue: 250.0)
     var lowLine = StorageValue<Double>(key: "lowLine", defaultValue: 70.0)
@@ -181,9 +186,22 @@ class Storage {
     var lastVersionUpdateNotificationShown = StorageValue<Date?>(key: "lastVersionUpdateNotificationShown", defaultValue: nil)
     var lastExpirationNotificationShown = StorageValue<Date?>(key: "lastExpirationNotificationShown", defaultValue: nil)
 
+    // MARK: - Telemetry -----------------------------------------------------------
+
+    // See LoopFollow/Helpers/Telemetry.swift.
+
+    var telemetryEnabled = StorageValue<Bool>(key: "telemetryEnabled", defaultValue: true)
+    var telemetryConsentDecisionMade = StorageValue<Bool>(key: "telemetryConsentDecisionMade", defaultValue: false)
+    var telemetryLastSentAt = StorageValue<Date?>(key: "telemetryLastSentAt", defaultValue: nil)
+    var telemetryLastSentSha = StorageValue<String>(key: "telemetryLastSentSha", defaultValue: "")
+
+    // Sliding 7-day window of cold-launch timestamps.
+    var telemetryColdLaunchTimes = StorageValue<[Date]>(key: "telemetryColdLaunchTimes", defaultValue: [])
+
     var hideInfoTable = StorageValue<Bool>(key: "hideInfoTable", defaultValue: false)
     var token = StorageValue<String>(key: "token", defaultValue: "")
     var units = StorageValue<String>(key: "units", defaultValue: "mg/dL")
+    var hasConfiguredUnits = StorageValue<Bool>(key: "hasConfiguredUnits", defaultValue: false)
 
     var infoSort = StorageValue<[Int]>(key: "infoSort", defaultValue: InfoType.allCases.map(\.sortOrder))
     var infoVisible = StorageValue<[Bool]>(key: "infoVisible", defaultValue: InfoType.allCases.map(\.defaultVisible))
@@ -192,8 +210,12 @@ class Storage {
     var device = StorageValue<String>(key: "device", defaultValue: "")
     var nsWriteAuth = StorageValue<Bool>(key: "nsWriteAuth", defaultValue: false)
     var nsAdminAuth = StorageValue<Bool>(key: "nsAdminAuth", defaultValue: false)
+    var webSocketEnabled = StorageValue<Bool>(key: "webSocketEnabled", defaultValue: true)
 
-    var migrationStep = StorageValue<Int>(key: "migrationStep", defaultValue: 0)
+    // When adding a new migration step in `runMigrationsIfNeeded()`, bump this default
+    // to the new latest step number so fresh installs skip all migrations. Other defaults
+    // in this file must reflect the post-migration final state for a fresh install.
+    var migrationStep = StorageValue<Int>(key: "migrationStep", defaultValue: 9)
 
     var persistentNotification = StorageValue<Bool>(key: "persistentNotification", defaultValue: false)
     var persistentNotificationLastBGTime = StorageValue<Date>(key: "persistentNotificationLastBGTime", defaultValue: .distantPast)
@@ -205,9 +227,9 @@ class Storage {
     // Tab positions - which position each item is in (positions 1-4 are customizable, 5 is always Menu)
     var homePosition = StorageValue<TabPosition>(key: "homePosition", defaultValue: .position1)
     var alarmsPosition = StorageValue<TabPosition>(key: "alarmsPosition", defaultValue: .position2)
-    var snoozerPosition = StorageValue<TabPosition>(key: "snoozerPosition", defaultValue: .menu)
-    var nightscoutPosition = StorageValue<TabPosition>(key: "nightscoutPosition", defaultValue: .position3)
-    var remotePosition = StorageValue<TabPosition>(key: "remotePosition", defaultValue: .position4)
+    var snoozerPosition = StorageValue<TabPosition>(key: "snoozerPosition", defaultValue: .position3)
+    var nightscoutPosition = StorageValue<TabPosition>(key: "nightscoutPosition", defaultValue: .position4)
+    var remotePosition = StorageValue<TabPosition>(key: "remotePosition", defaultValue: .menu)
     var statisticsPosition = StorageValue<TabPosition>(key: "statisticsPosition", defaultValue: .menu)
     var treatmentsPosition = StorageValue<TabPosition>(key: "treatmentsPosition", defaultValue: .menu)
 
@@ -215,10 +237,14 @@ class Storage {
 
     var bolusIncrement = SecureStorageValue<HKQuantity>(key: "bolusIncrement", defaultValue: HKQuantity(unit: .internationalUnit(), doubleValue: 0.05))
     var bolusIncrementDetected = StorageValue<Bool>(key: "bolusIncrementDetected", defaultValue: false)
+
+    var remoteBolusHistory = StorageValue<[RemoteBolusHistoryEntry]>(key: "remoteBolusHistory", defaultValue: [])
+    var remoteMealHistory = StorageValue<[RemoteMealHistoryEntry]>(key: "remoteMealHistory", defaultValue: [])
     // Statistics display preferences
     var showGMI = StorageValue<Bool>(key: "showGMI", defaultValue: true)
     var showStdDev = StorageValue<Bool>(key: "showStdDev", defaultValue: true)
     var showTITR = StorageValue<Bool>(key: "showTITR", defaultValue: false)
+    var timeInRangeModeRaw = StorageValue<String>(key: "timeInRangeMode", defaultValue: "TIR")
 
     static let shared = Storage()
     private init() {}
@@ -232,8 +258,8 @@ class Storage {
     /// launch, where Storage was initialized while UserDefaults was encrypted and all values were
     /// cached as their defaults.
     ///
-    /// `migrationStep` is intentionally excluded: viewDidLoad writes it to 6 during the BFU
-    /// launch; if we reloaded it and the flush had somehow not landed yet, migrations would re-run.
+    /// `migrationStep` is intentionally excluded: viewDidLoad writes it to the latest step during
+    /// the BFU launch; if we reloaded it and the flush had somehow not landed yet, migrations would re-run.
     ///
     /// SecureStorageValue properties (maxBolus, maxCarbs, maxProtein, maxFat, bolusIncrement) are
     /// not covered here — SecureStorageValue does not implement reload() and Keychain has the same
@@ -324,6 +350,9 @@ class Storage {
         laEnabled.reload()
         laRenewBy.reload()
         laRenewalFailed.reload()
+        laPushToStartToken.reload()
+        laLastPushToStartAt.reload()
+        laPushToStartBackoff.reload()
 
         showDots.reload()
         showLines.reload()
@@ -336,6 +365,7 @@ class Storage {
         smallGraphTreatments.reload()
         smallGraphHeight.reload()
         predictionToLoad.reload()
+        predictionDisplayType.reload()
         minBasalScale.reload()
         minBGScale.reload()
         lowLine.reload()
@@ -404,9 +434,12 @@ class Storage {
 
         loopAPNSQrCodeURL.reload()
         bolusIncrementDetected.reload()
+        remoteBolusHistory.reload()
+        remoteMealHistory.reload()
         showGMI.reload()
         showStdDev.reload()
         showTITR.reload()
+        timeInRangeModeRaw.reload()
     }
 
     // MARK: - Tab Position Helpers
